@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أنيس - رفيق القرب من الله</title>
+    <style>
+        :root {
+            --primary-color: #2c5e43;
+            --secondary-color: #e8f5e9;
+            --text-color: #333;
+            --accent-color: #8da47e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f5;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        .period-badge {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .content-box {
+            border-right: 4px solid var(--primary-color);
+            background-color: #fafbfc;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            text-align: right;
+        }
+
+        .scale-section {
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .scale-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: var(--primary-color);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #666;
+            padding: 0 5px;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #1e422f;
+        }
+
+        #feedback-message {
+            margin-top: 15px;
+            font-weight: 500;
+            color: var(--primary-color);
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>أنيس</h1>
+    <div class="subtitle">مساعدك اليومي للقرب من الله</div>
+
+    <!-- قسم الفترة والورد -->
+    <div id="period-badge" class="period-badge">جاري تحديد الفترة...</div>
+    <div id="ward-box" class="content-box">
+        جاري تحميل وردك الحالي...
+    </div>
+
+    <!-- قسم مقياس القرب الختامي -->
+    <div class="scale-section">
+        <div class="scale-title">مقياس القرب (تأمل يومك)</div>
+        <p style="font-size: 0.9rem; color: #666;">كيف تجد قلبك وعلاقتك مع الله في ختام هذا اليوم؟</p>
+        
+        <div class="slider-container">
+            <input type="range" id="closeness-slider" min="1" max="3" value="2">
+            <div class="slider-labels">
+                <span>أحتاج للعودة والتصحيح</span>
+                <span>أجاهد نفسي وأرجو</span>
+                <span>أجد سكينة وقرباً</span>
+            </div>
+        </div>
+
+        <button class="btn-submit" onclick="calculateReflection()">تسجيل التأمل</button>
+        <div id="feedback-message"></div>
+    </div>
+</div>
+
+<script>
+    // بيانات الأوراد حسب فترات اليوم
+    const database = {
+        morning: {
+            name: "الفترة الصباحية (بكور اليوم)",
+            text: "يا حي يا قيوم برحمتك أستغيث، أصلح لي شأني كله ولا تكلني إلى نفسي طرفة عين. استفتح يومك بتجديد النية: كل عمل مباح تعمله اليوم يمكنك تحويله لعبادة بالنية الصالحة."
+        },
+        afternoon: {
+            name: "الفترة المسائية (وسط اليوم)",
+            text: "وسط زحام الحياة والمسؤوليات، اقطع الطريق على الغفلة الآن بـ (أستغفر الله العظيم وأتوب إليه) 10 مرات بتدبر. تذكر: الله يراك ويعلم جهادك."
+        },
+        night: {
+            name: "فترة الليل (حصاد اليوم)",
+            text: "انتهى اليوم بحلوه ومره، ولم يبقَ لك إلا ما قدمته لله. تنفس بعمق، سامح الخلق، واجعل آخر كلامك ذكراً لله. إن غلبتك ذنوب اليوم، فربك يبسط يده بالليل ليتوب مسيء النهار."
+        }
+    };
+
+    // تحديد الفترة الحالية بناءً على الساعة
+    function getHourPeriod() {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 12) return 'morning';
+        if (hour >= 12 && hour < 18) return 'afternoon';
+        return 'night';
+    }
+
+    // عرض الورد المناسب
+    function loadWard() {
+        const period = getHourPeriod();
+        document.getElementById('period-badge').innerText = database[period].name;
+        document.getElementById('ward-box').innerText = database[period].text;
+    }
+
+    // التفاعل مع مقياس القرب المطلق
+    function calculateReflection() {
+        const val = document.getElementById('closeness-slider').value;
+        const feedback = document.getElementById('feedback-message');
+        
+        if (val == 1) {
+            feedback.innerText = "❤️ لا بأس، العودة إلى الله هي أولى خطوات القرب. استغفر الآن، والمسار دائماً مفتوح.";
+        } else if (val == 2) {
+            feedback.innerText = "🌱 والذين جاهدوا فينا لنهدينهم سبلنا. جهادك لنفسك هو عين القرب، اثبت وجدد العزم.";
+        } else {
+            feedback.innerText = "✨ الحمد لله الذي بنعمته تتم الصالحات. سلِ الله الثبات، واجعل هذه السكينة دافعاً للمزيد من الإحسان.";
+        }
+    }
+
+    // تشغيل الدالة عند تحميل الصفحة
+    window.onload = loadWard;
+</script>
+
+</body>
+</html>
